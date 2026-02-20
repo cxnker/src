@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Obfuscator | Definitive Edition</title>
+    <style>
+        :root {
+            /* Base Hexagon Colors */
+            --bg: #0a0a0f;
+            --card: #14141c;
+            --border: #2a2a3a;
+            --text: #e0e0ff;
+            --accent: #7d5fff;
+            --accent-glow: #9d7fff;
+            --success: #4cd964;
+            --error: #ff3b30;
+            --input-bg: #1e1e2a;
+
+            /* iOS Toggle Colors */
+            --ios-green: #30d158;
+            --ios-accent: #0a84ff;
+            --ios-purple: #bf5af2;
+            --ios-red: #ff453a;
+            --ios-indigo: #5e5ce6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .header .badge {
+            background: linear-gradient(135deg, var(--accent), #a55);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-top: 10px;
+            box-shadow: 0 0 20px rgba(125, 95, 255, 0.3);
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title::before {
+            content: '◆';
+            color: var(--accent);
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            padding: 15px;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(125, 95, 255, 0.2);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .option-item label {
+            cursor: pointer;
+        }
+
+        /* ================= iOS TOGGLES ANIMADOS ================= */
+        .toggle-switch { position: relative; display: inline-block; width: 54px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-switch:hover { opacity: 0.95; }
+        .slider-switch { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
+            background-color: #39393d; transition: .3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px; 
+        }
+        .slider-switch:before { 
+            position: absolute; content: ""; height: 20px; width: 32px; left: 0px; bottom: 2px; 
+            background-color: white; transition: .3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        input:checked + .slider-switch { animation: haptic-pop 0.3s ease; }
+        input:checked + .slider-switch:before { transform: translateX(20px); }
+
+        /* Colores asignados a los toggles (desde Gemini Gen) */
+        #optTamper:checked + .slider-switch { background-color: var(--ios-red); }
+        #optVM:checked + .slider-switch { background-color: var(--ios-indigo); }
+        #optControlFlow:checked + .slider-switch { background-color: var(--ios-purple); }
+        #optStrings:checked + .slider-switch { background-color: var(--ios-accent); }
+        #optNumbers:checked + .slider-switch { background-color: var(--ios-accent); }
+        #optBooleans:checked + .slider-switch { background-color: var(--ios-accent); }
+        #optOpcode:checked + .slider-switch { background-color: var(--ios-purple); }
+        #optShuffle:checked + .slider-switch { background-color: var(--ios-green); }
+
+        @keyframes haptic-pop { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.05); } 
+            100% { transform: scale(1); } 
+        }
+
+        /* ================= iOS SLIDER ANIMADO ================= */
+        .slider-container { 
+            display: flex; align-items: center; gap: 15px; padding: 15px 20px; 
+            background: var(--input-bg); border-radius: 8px; margin-top: 15px; 
+            border: 1px solid var(--border);
+        }
+        .slider-label { min-width: 120px; }
+        .ios-slider-wrapper { position: relative; flex: 1; height: 6px; background: #39393d; border-radius: 10px; display: flex; align-items: center; }
+        #slider-fill { position: absolute; height: 100%; background: var(--accent); border-radius: 10px; width: 50%; z-index: 1; }
+        
+        .ios-slider { -webkit-appearance: none; width: 100%; background: transparent; outline: none; position: relative; z-index: 2; margin: 0; cursor: pointer; }
+        .ios-slider::-webkit-slider-thumb { 
+            -webkit-appearance: none; width: 32px; height: 14px; background: #ffffff; 
+            border-radius: 10px; border: none; cursor: grab; box-shadow: 0 4px 8px rgba(0,0,0,0.6); 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1.4), width 0.2s ease; 
+        }
+        .ios-slider::-webkit-slider-thumb:hover { transform: scale(1.05); opacity: 0.9; }
+        .ios-slider::-webkit-slider-thumb:active { transform: scale(1.1); width: 38px; opacity: 0.85; }
+
+        /* ================= BOTONES (FUSIÓN DEFINITIVA) ================= */
+        /* Estilo base del botón principal (desde iOS Style, adaptado) */
+        .btn {
+            position: relative;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), #5f3fff);
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 10px 0;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            opacity: 0.85;
+        }
+
+        .btn.loading {
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Contenedor de herramientas de salida */
+        .output-tools {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        /* Estilo de los botones de herramienta (COPY y DOWNLOAD desde iOS Style) */
+        .tool-btn {
+            flex: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .tool-btn:hover {
+            color: var(--accent);
+            opacity: 0.9;
+        }
+
+        .tool-btn:active {
+            opacity: 0.7;
+        }
+
+        .stats-bar {
+            background: var(--input-bg);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            border: 1px solid var(--border);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NOVA OBFUSCATOR</h1>
+            <div class="badge">DEFINITIVE EDITION • v4.0.0</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">INPUT CODE</div>
+            <textarea id="input" placeholder="-- Paste your Lua code here...">print("Hello from Nova Obfuscator Definitive Edition!")</textarea>
+        </div>
+
+        <div class="card">
+            <div class="card-title">PROTECTION LAYERS</div>
+            <div class="options-grid" id="optionsGrid">
+                <div class="option-item">
+                    <label>Anti-Tamper</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optTamper" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>VM Functions</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optVM" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>Control Flow</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optControlFlow" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>String Obfuscation</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optStrings" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>Number Obfuscation</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optNumbers" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>Boolean/Nil Obf</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optBooleans" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>Opcode Table</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optOpcode" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>Table Shuffle</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="optShuffle" checked>
+                        <span class="slider-switch"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <span class="slider-label">Intensity: <span id="intensityValue">15</span></span>
+                <div class="ios-slider-wrapper">
+                    <div id="slider-fill"></div>
+                    <input type="range" id="intensitySlider" class="ios-slider" min="1" max="50" value="15">
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón principal con estilo y animación de iOS -->
+        <button class="btn" id="obfuscateBtn">
+            <span class="spinner" id="btnSpinner"></span>
+            <span id="btnText">GENERATE PROTECTED CODE</span>
+        </button>
+
+        <div class="card">
+            <div class="card-title">OUTPUT</div>
+            <textarea id="output" readonly placeholder="-- Your protected code will appear here..."></textarea>
+            
+            <!-- Contenedor de botones con los nuevos estilos -->
+            <div class="output-tools">
+                <button class="tool-btn" id="copyBtn">COPY</button>
+                <button class="tool-btn" id="downloadBtn">DOWNLOAD</button>
+            </div>
+
+            <div class="stats-bar">
+                <span id="status">STATUS: READY</span>
+                <span id="stats">SIZE: 0 KB | LAYERS: 8</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Nova Obfuscator • Advanced Lua Protection • Definitive Edition</p>
+            <p style="margin-top: 5px; font-size: 0.8em;">© 2026 • Design mix iOS + Hexagon</p>
+        </div>
+    </div>
+
+    <script>
+        // Variables DOM
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+        const obfuscateBtn = document.getElementById('obfuscateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        
+        const intensitySlider = document.getElementById('intensitySlider');
+        const sliderFill = document.getElementById('slider-fill');
+        const intensityValue = document.getElementById('intensityValue');
+        
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Lógica del Slider estilo iOS
+        function updateSlider(val) {
+            intensityValue.textContent = val;
+            sliderFill.style.width = ((val / 50) * 100) + '%';
+        }
+
+        intensitySlider.addEventListener('input', (e) => {
+            updateSlider(e.target.value);
+        });
+
+        // Inicializar el slider
+        updateSlider(15);
+
+        // Lógica del botón animado (con spinner de iOS)
+        obfuscateBtn.addEventListener('click', () => {
+            if (!input.value.trim()) return;
+            
+            // Estado de carga
+            btnSpinner.style.display = 'inline-block';
+            btnText.textContent = 'PROCESSING...';
+            obfuscateBtn.classList.add('loading');
+            
+            // Simular procesamiento
+            setTimeout(() => {
+                output.value = "-- Protected successfully by Nova Obfuscator\n" + input.value;
+                
+                // Restaurar botón
+                btnSpinner.style.display = 'none';
+                btnText.textContent = 'GENERATE PROTECTED CODE';
+                obfuscateBtn.classList.remove('loading');
+                
+                document.getElementById('status').textContent = 'STATUS: SUCCESS';
+            }, 800);
+        });
+
+        // Copiar al portapapeles (con feedback)
+        copyBtn.addEventListener('click', () => {
+            if (!output.value) return;
+            output.select();
+            document.execCommand('copy');
+            copyBtn.textContent = 'COPIED!';
+            setTimeout(() => {
+                copyBtn.textContent = 'COPY';
+            }, 1500);
+        });
+
+        // Descargar archivo Lua
+        downloadBtn.addEventListener('click', () => {
+            if (!output.value) return;
+            const blob = new Blob([output.value], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'protected_' + Date.now() + '.lua';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
