@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>TheWorldofPC - Windows LiteOS Custom Builds</title>
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --head-color: #262d3d;
+            --body-color: #48525c;
+            --body-altColor: #767676;
+            --body-bg: #fefefe;
+            --link-color: #204ecf;
+            --link-bg: #204ecf;
+            --icon-color: #48525c;
+            --icon-alt: #455065;
+            --icon-sec: #767676;
+            --header-text: #48525c;
+            --header-title: 18px;
+            --header-bg: #fefefe;
+            --header-icon: #262d3d;
+            --header-height: 70px;
+            --content-bg: #fefefe;
+            --content-border: #eceff1;
+            --transparent-bg: rgba(0,0,0,.03);
+            --nav-width: 260px;
+            --nav-border: 1px;
+            --nav-text: #262d3d;
+            --nav-icon: #48525c;
+            --nav-bg: #fefefe;
+            --font-head: 'Segoe UI', 'Poppins', sans-serif;
+            --font-body: 'Segoe UI', 'Noto Sans', sans-serif;
+            --transition: all 0.3s ease;
+            
+            /* Dark mode */
+            --dark-text: #fefefe;
+            --dark-textAlt: #989b9f;
+            --dark-link: #005af0;
+            --dark-bg: #1e1e1e;
+            --dark-bgAlt: #2d2d30;
+            --dark-bgSec: #252526;
+        }
+
+        .dark-mode {
+            --body-bg: var(--dark-bg);
+            --body-color: var(--dark-text);
+            --head-color: var(--dark-text);
+            --header-bg: var(--dark-bg);
+            --header-text: var(--dark-text);
+            --header-icon: var(--dark-text);
+            --content-bg: var(--dark-bg);
+            --icon-color: var(--dark-text);
+            --nav-bg: var(--dark-bg);
+            --nav-text: var(--dark-text);
+            --nav-icon: var(--dark-text);
+            --content-border: #333;
+            --transparent-bg: rgba(255,255,255,.05);
+        }
+
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--body-color);
+            background-color: var(--body-bg);
+            line-height: 1.5;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--icon-color);
+        }
+
+        svg.line {
+            fill: none;
+            stroke: var(--icon-color);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--content-border);
+            z-index: 100;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .header-content {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: var(--nav-width);
+        }
+
+        .menu-btn {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+
+        .menu-btn .hamburger-icon,
+        .menu-btn .arrow-icon {
+            position: absolute;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .menu-btn .arrow-icon {
+            opacity: 0;
+            transform: rotate(0deg);
+        }
+
+        .menu-open .menu-btn .hamburger-icon {
+            opacity: 0;
+            transform: rotate(90deg);
+        }
+
+        .menu-open .menu-btn .arrow-icon {
+            opacity: 1;
+            transform: rotate(0);
+        }
+
+        .site-title {
+            font-size: var(--header-title);
+            font-weight: 700;
+            color: var(--header-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .header-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 25px;
+        }
+
+        .search-container {
+            max-width: 550px;
+            width: 100%;
+        }
+
+        .search-form {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-form input {
+            width: 100%;
+            padding: 12px 48px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--transparent-bg);
+            font-size: 14px;
+            outline: none;
+            color: var(--body-color);
+        }
+
+        .search-btn {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-btn svg {
+            width: 18px;
+            height: 18px;
+            opacity: 0.7;
+        }
+
+        .search-close {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .search-form input:focus ~ .search-close {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .dark-toggle {
+            width: 26px;
+            height: 18px;
+            border: 1px solid var(--header-icon);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .dark-toggle::before {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: 2px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--header-icon);
+            transition: transform 0.2s;
+        }
+
+        .dark-mode .dark-toggle::before {
+            transform: translateX(10px);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            width: 280px;
+            background-color: var(--body-bg);
+            border: 1px solid var(--content-border);
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .profile-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            top: 50px;
+        }
+
+        .profile-header {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--content-border);
+        }
+
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--transparent-bg);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            color: var(--head-color);
+            font-size: 14px;
+        }
+
+        .profile-bio {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            list-style: none;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+        }
+
+        /* ===== SIDE MENU ===== */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--nav-width);
+            background-color: var(--nav-bg);
+            border-right: var(--nav-border) solid var(--content-border);
+            z-index: 99;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-open .side-menu {
+            transform: translateX(0);
+        }
+
+        .menu-content {
+            height: 100%;
+            padding: 20px 0 90px;
+            overflow-y: auto;
+        }
+
+        .menu-header {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--content-border);
+            margin-bottom: 10px;
+        }
+
+        .menu-header .menu-close-btn {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-header span {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 25px;
+            color: var(--nav-text);
+            transition: background 0.2s;
+        }
+
+        .menu-link:hover {
+            background-color: var(--transparent-bg);
+        }
+
+        .menu-link svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--nav-icon);
+        }
+
+        .menu-link svg.line {
+            fill: none;
+            stroke: var(--nav-icon);
+        }
+
+        .menu-link .menu-text {
+            flex: 1;
+        }
+
+        .menu-break {
+            height: 1px;
+            background-color: var(--content-border);
+            margin: 15px 25px;
+        }
+
+        .menu-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            padding: 0 25px;
+        }
+
+        .menu-footer .social-links {
+            padding: 0;
+            justify-content: flex-start;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* EL HEADER NO SE MUEVE - Solo el contenido principal se desplaza */
+        .menu-open .main-wrapper {
+            margin-left: var(--nav-width);
+        }
+
+        /* El header NO debe tener margin-left */
+        .menu-open header {
+            margin-left: 0;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 25px;
+            width: 100%;
+            flex: 1;
+            transition: var(--transition);
+        }
+
+        /* ===== BLOG HEADER ===== */
+        .blog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .blog-header h2 {
+            font-size: 20px;
+            color: var(--head-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .blog-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background-color: var(--body-altColor);
+        }
+
+        .view-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .view-toggle span {
+            opacity: 0.7;
+            font-size: 12px;
+        }
+
+        .view-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .view-toggle .list-icon {
+            display: none;
+        }
+
+        .list-mode .view-toggle .grid-icon {
+            display: none;
+        }
+
+        .list-mode .view-toggle .list-icon {
+            display: block;
+        }
+
+        /* ===== BLOG LAYOUT ===== */
+        .blog-layout {
+            display: flex;
+            gap: 40px;
+        }
+
+        .mainbar {
+            flex: 1;
+            max-width: 780px;
+        }
+
+        .sidebar {
+            flex: 0 0 260px; /* Reducido de 300px a 260px */
+        }
+
+        /* ===== BLOG POSTS ===== */
+        .blog-posts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px 20px;
+        }
+
+        .list-mode .blog-posts {
+            grid-template-columns: 1fr;
+        }
+
+        .post-card {
+            background-color: var(--body-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .list-mode .post-card {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .post-thumb {
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            background-color: var(--transparent-bg);
+            aspect-ratio: 16/9;
+            margin-bottom: 15px;
+        }
+
+        .post-thumb a {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .post-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .post-card:hover .post-thumb img {
+            transform: scale(1.05);
+        }
+
+        .post-content {
+            padding: 0;
+        }
+
+        .list-mode .post-content {
+            flex: 1;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .post-category {
+            color: var(--link-color);
+            font-weight: 500;
+        }
+
+        .post-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .post-title a {
+            color: var(--head-color);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-excerpt {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .post-date {
+            opacity: 0.7;
+        }
+
+        .post-comments {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--body-color);
+        }
+
+        .post-comments svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ===== SIDEBAR WIDGETS ===== */
+        .sidebar-widget {
+            margin-bottom: 40px;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--content-border);
+            position: relative;
+        }
+
+        .widget-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background-color: var(--body-altColor);
+        }
+
+        .popular-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .popular-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--head-color);
+            opacity: 0.3;
+            line-height: 1;
+        }
+
+        .popular-content {
+            flex: 1;
+        }
+
+        .popular-title {
+            font-size: 14px;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .popular-title a {
+            color: var(--head-color);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .popular-meta {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* ===== LOAD MORE BUTTON ===== */
+        .load-more {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .load-more a {
+            background-color: var(--link-bg);
+            color: white;
+            padding: 12px 35px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .load-more a:hover {
+            opacity: 0.8;
+        }
+
+        /* ===== MOBILE MENU ===== */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--body-bg);
+            border-top: 1px solid var(--content-border);
+            padding: 10px 20px;
+            z-index: 95;
+        }
+
+        .mobile-menu ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+        }
+
+        .mobile-menu li {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            border-top: 1px solid var(--content-border);
+            margin-top: 50px;
+            width: 100%;
+            transition: margin-left 0.3s ease;
+        }
+
+        .menu-open footer {
+            margin-left: var(--nav-width);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .back-top {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .back-top svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .blog-posts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .blog-layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                flex: 1;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-left {
+                width: auto;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .main-wrapper {
+                margin-bottom: 70px;
+            }
+            
+            /* En móvil, comportamiento diferente */
+            .menu-open .main-wrapper,
+            .menu-open footer {
+                margin-left: 0;
+            }
+            
+            .side-menu {
+                width: 85%;
+                max-width: 350px;
+            }
+            
+            .menu-header span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-posts {
+                grid-template-columns: 1fr;
+            }
+            
+            .list-mode .post-card {
+                flex-direction: column;
+            }
+            
+            .list-mode .post-thumb {
+                flex: 1;
+            }
+            
+            .post-title {
+                font-size: 16px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper" id="mainWrapper">
+        <!-- ===== HEADER ===== -->
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="menu-btn" id="menuToggle">
+                        <!-- Hamburger Icon -->
+                        <svg class="hamburger-icon line" viewBox="0 0 24 24">
+                            <line x1="3" x2="21" y1="12" y2="12"></line>
+                            <line x1="3" x2="21" y1="6" y2="6"></line>
+                            <line x1="3" x2="21" y1="18" y2="18"></line>
+                        </svg>
+                        <!-- Arrow Icon (para cuando está abierto) -->
+                        <svg class="arrow-icon line" viewBox="0 0 24 24">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="site-title">TheWorldofPC</div>
+                </div>
+                
+                <div class="header-right">
+                    <div class="search-container">
+                        <form class="search-form">
+                            <input type="text" placeholder="Search...">
+                            <button type="submit" class="search-btn">
+                                <svg class="line" viewBox="0 0 24 24">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                            <button type="reset" class="search-close">
+                                <svg class="line" viewBox="0 0 24 24">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="header-icons">
+                        <div class="icon-btn dark-toggle" id="darkToggle"></div>
+                        
+                        <div class="icon-btn" id="profileToggle">
+                            <svg class="line" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            
+                            <!-- Profile Dropdown -->
+                            <div class="profile-dropdown" id="profileDropdown">
+                                <div class="profile-header">
+                                    <div class="profile-img" style="background-image: url('https://via.placeholder.com/50');"></div>
+                                    <div>
+                                        <div class="profile-name">The_World_Of_PC</div>
+                                        <div class="profile-bio">Windows enthusiast & developer</div>
+                                    </div>
+                                </div>
+                                <ul class="social-links">
+                                    <li><a href="#"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a></li>
+                                    <li><a href="#"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a></li>
+                                    <li><a href="#"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== SIDE MENU ===== -->
+        <nav class="side-menu" id="sideMenu">
+            <div class="menu-content">
+                <div class="menu-header">
+                    <div class="menu-close-btn" id="menuCloseBtn">
+                        <svg class="line" viewBox="0 0 24 24">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </div>
+                    <span>Back</span>
+                </div>
+                
+                <ul class="menu-list">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <svg class="line" viewBox="0 0 24 24">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span class="menu-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <svg class="line" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span class="menu-text">About</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <svg class="line" viewBox="0 0 24 24">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            <span class="menu-text">Contact</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <svg class="line" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span class="menu-text">Downloads</span>
+                        </a>
+                    </li>
+                    
+                    <div class="menu-break"></div>
+                    
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <svg class="line" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <circle cx="12" cy="8" r="1" fill="currentColor"></circle>
+                            </svg>
+                            <span class="menu-text">Disclaimer</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <svg class="line" viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                            <span class="menu-text">Privacy Policy</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="menu-footer">
+                    <ul class="social-links">
+                        <li><a href="#"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a></li>
+                        <li><a href="#"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a></li>
+                        <li><a href="#"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-content">
+            <!-- Blog Header -->
+            <div class="blog-header">
+                <h2>Latest Windows Builds</h2>
+                <div class="view-toggle" id="viewToggle">
+                    <span>Grid</span>
+                    <svg class="grid-icon" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    <svg class="list-icon" viewBox="0 0 24 24">
+                        <line x1="8" y1="6" x2="21" y2="6"/>
+                        <line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/>
+                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Blog Layout -->
+            <div class="blog-layout">
+                <main class="mainbar">
+                    <div class="blog-posts" id="blogPosts">
+                        <!-- Post 1 -->
+                        <article class="post-card">
+                            <div class="post-thumb">
+                                <a href="#">
+                                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500" alt="Windows 11">
+                                </a>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-category">Windows 11</span>
+                                    <span>•</span>
+                                    <span>LiteOS</span>
+                                </div>
+                                <h3 class="post-title">
+                                    <a href="#">Nexus LiteOS 11 (22631.2861) | No TPM Needed</a>
+                                </h3>
+                                <p class="post-excerpt">
+                                    Pre-tweaked Windows 11 image for improved gaming performance and privacy. Removes bloatware and optimizes system resources.
+                                </p>
+                                <div class="post-footer">
+                                    <span class="post-date">March 28, 2024</span>
+                                    <a href="#" class="post-comments">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                        <span>3</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 2 -->
+                        <article class="post-card">
+                            <div class="post-thumb">
+                                <a href="#">
+                                    <img src="https://images.unsplash.com/photo-1569770218135-bea267ed7e84?w=500" alt="Windows 10">
+                                </a>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-category">Windows 10</span>
+                                    <span>•</span>
+                                    <span>LTSC 2021</span>
+                                </div>
+                                <h3 class="post-title">
+                                    <a href="#">Nexus LiteOS 10 : LTSC 2021 (19044.2846) x64</a>
+                                </h3>
+                                <p class="post-excerpt">
+                                    Multi-language Windows 10 LTSC with performance tweaks. Perfect for gamers and power users who want a clean system.
+                                </p>
+                                <div class="post-footer">
+                                    <span class="post-date">March 4, 2024</span>
+                                    <a href="#" class="post-comments">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                        <span>4</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 3 -->
+                        <article class="post-card">
+                            <div class="post-thumb">
+                                <a href="#">
+                                    <img src="https://images.unsplash.com/photo-1597852074816-d933c7d2b988?w=500" alt="Windows XP">
+                                </a>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-category">Windows XP</span>
+                                    <span>•</span>
+                                    <span>2021 Edition</span>
+                                </div>
+                                <h3 class="post-title">
+                                    <a href="#">Windows XP : 2021 Edition x64</a>
+                                </h3>
+                                <p class="post-excerpt">
+                                    Classic Windows XP experience based on Windows 10 1909. Includes classic theme with modern compatibility.
+                                </p>
+                                <div class="post-footer">
+                                    <span class="post-date">March 4, 2024</span>
+                                    <a href="#" class="post-comments">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                        <span>4</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 4 -->
+                        <article class="post-card">
+                            <div class="post-thumb">
+                                <a href="#">
+                                    <img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500" alt="Windows 11">
+                                </a>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-category">Windows 11</span>
+                                    <span>•</span>
+                                    <span>LTSC Like</span>
+                                </div>
+                                <h3 class="post-title">
+                                    <a href="#">Nexus LiteOS 11 (22621.1702) LTSC Edition</a>
+                                </h3>
+                                <p class="post-excerpt">
+                                    Lightweight Windows 11 without TPM requirements. Optimized for performance and stability.
+                                </p>
+                                <div class="post-footer">
+                                    <span class="post-date">June 4, 2023</span>
+                                    <a href="#" class="post-comments">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                        <span>1</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 5 -->
+                        <article class="post-card">
+                            <div class="post-thumb">
+                                <a href="#">
+                                    <img src="https://images.unsplash.com/photo-1593642634367-d91a135587b5?w=500" alt="Windows 10">
+                                </a>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-category">Windows 10</span>
+                                    <span>•</span>
+                                    <span>1709</span>
+                                </div>
+                                <h3 class="post-title">
+                                    <a href="#">Nexus LiteOS 10 : 1709 (x86/x64) Low Latency</a>
+                                </h3>
+                                <p class="post-excerpt">
+                                    Specially optimized for low-end PCs. Better FPS and reduced input lag for gaming.
+                                </p>
+                                <div class="post-footer">
+                                    <span class="post-date">September 22, 2023</span>
+                                    <a href="#" class="post-comments">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                        <span>9</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 6 -->
+                        <article class="post-card">
+                            <div class="post-thumb">
+                                <a href="#">
+                                    <img src="https://images.unsplash.com/photo-1603487742131-4160ec999306?w=500" alt="Windows 10 LTSB">
+                                </a>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-category">Windows 10</span>
+                                    <span>•</span>
+                                    <span>LTSB</span>
+                                </div>
+                                <h3 class="post-title">
+                                    <a href="#">Nexus LiteOS 10 : LTSB (14393.5009) Superlite</a>
+                                </h3>
+                                <p class="post-excerpt">
+                                    Ultra-lightweight Windows 10 for very old hardware. Minimal RAM usage and disk space.
+                                </p>
+                                <div class="post-footer">
+                                    <span class="post-date">June 4, 2023</span>
+                                    <a href="#" class="post-comments">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                        <span>2</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Load More -->
+                    <div class="load-more">
+                        <a href="#">Load more posts</a>
+                    </div>
+                </main>
+
+                <!-- ===== SIDEBAR ===== -->
+                <aside class="sidebar">
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Popular Downloads</h3>
+                        <div class="popular-list">
+                            <div class="popular-item">
+                                <span class="popular-number">01</span>
+                                <div class="popular-content">
+                                    <h4 class="popular-title"><a href="#">Nexus LiteOS 11 (22631.2861)</a></h4>
+                                    <div class="popular-meta">2.1k downloads • 28 comments</div>
+                                </div>
+                            </div>
+                            <div class="popular-item">
+                                <span class="popular-number">02</span>
+                                <div class="popular-content">
+                                    <h4 class="popular-title"><a href="#">Nexus LiteOS 10 LTSC 2021</a></h4>
+                                    <div class="popular-meta">1.8k downloads • 14 comments</div>
+                                </div>
+                            </div>
+                            <div class="popular-item">
+                                <span class="popular-number">03</span>
+                                <div class="popular-content">
+                                    <h4 class="popular-title"><a href="#">Windows XP 2021 Edition</a></h4>
+                                    <div class="popular-meta">1.5k downloads • 19 comments</div>
+                                </div>
+                            </div>
+                            <div class="popular-item">
+                                <span class="popular-number">04</span>
+                                <div class="popular-content">
+                                    <h4 class="popular-title"><a href="#">Nexus LiteOS 10 1709</a></h4>
+                                    <div class="popular-meta">1.2k downloads • 9 comments</div>
+                                </div>
+                            </div>
+                            <div class="popular-item">
+                                <span class="popular-number">05</span>
+                                <div class="popular-content">
+                                    <h4 class="popular-title"><a href="#">Nexus LiteOS 11 Barebone</a></h4>
+                                    <div class="popular-meta">987 downloads • 7 comments</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Categories</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Windows 11</a>
+                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Windows 10</a>
+                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Windows XP</a>
+                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">LiteOS</a>
+                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">LTSC</a>
+                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Gaming</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- ===== MOBILE MENU ===== -->
+        <div class="mobile-menu">
+            <ul>
+                <li id="mobileMenuBtn">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="3" x2="21" y1="12" y2="12"/>
+                        <line x1="3" x2="21" y1="6" y2="6"/>
+                        <line x1="3" x2="21" y1="18" y2="18"/>
+                    </svg>
+                </li>
+                <li onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 19V5M5 12l7-7 7 7"/>
+                    </svg>
+                </li>
+                <li id="mobileDarkToggle">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </li>
+                <li onclick="document.querySelector('.search-form input').focus()">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            <div class="footer-content">
+                <p>© 2025 · TheWorldofPC. All rights reserved. Windows is a trademark of Microsoft Corporation.</p>
+                <div class="back-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <span>Back to top</span>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 19V5M5 12l7-7 7 7"/>
+                    </svg>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // Dark Mode Toggle
+        const darkToggle = document.getElementById('darkToggle');
+        const mobileDarkToggle = document.getElementById('mobileDarkToggle');
+        const body = document.body;
+
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+        }
+
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+        }
+
+        darkToggle.addEventListener('click', toggleDarkMode);
+        if (mobileDarkToggle) {
+            mobileDarkToggle.addEventListener('click', toggleDarkMode);
+        }
+
+        // Profile Dropdown
+        const profileToggle = document.getElementById('profileToggle');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileToggle.contains(e.target)) {
+                profileDropdown.classList.remove('active');
+            }
+        });
+
+        // View Toggle
+        const viewToggle = document.getElementById('viewToggle');
+        const mainWrapper = document.getElementById('mainWrapper');
+
+        if (localStorage.getItem('viewMode') === 'list') {
+            mainWrapper.classList.add('list-mode');
+        }
+
+        viewToggle.addEventListener('click', () => {
+            mainWrapper.classList.toggle('list-mode');
+            localStorage.setItem('viewMode', mainWrapper.classList.contains('list-mode') ? 'list' : 'grid');
+        });
+
+        // Menu Toggle - Header se queda quieto, contenido se mueve
+        const menuToggle = document.getElementById('menuToggle');
+        const menuCloseBtn = document.getElementById('menuCloseBtn');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sideMenu = document.getElementById('sideMenu');
+
+        function openMenu() {
+            mainWrapper.classList.add('menu-open');
+        }
+
+        function closeMenu() {
+            mainWrapper.classList.remove('menu-open');
+        }
+
+        function toggleMenu() {
+            mainWrapper.classList.toggle('menu-open');
+        }
+
+        // Event listeners para abrir/cerrar menú
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleMenu);
+        }
+
+        if (menuCloseBtn) {
+            menuCloseBtn.addEventListener('click', closeMenu);
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', toggleMenu);
+        }
+
+        // Cerrar menú con tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mainWrapper.classList.contains('menu-open')) {
+                closeMenu();
+            }
+        });
+
+        // Update year
+        document.querySelector('.footer-content p').innerHTML = 
+            document.querySelector('.footer-content p').innerHTML.replace('2025', new Date().getFullYear());
+
+        // Search close button
+        const searchInput = document.querySelector('.search-form input');
+        const searchClose = document.querySelector('.search-close');
+        
+        if (searchClose) {
+            searchClose.addEventListener('click', () => {
+                searchInput.value = '';
+                searchInput.focus();
+            });
+        }
+    </script>
+</body>
+</html>
