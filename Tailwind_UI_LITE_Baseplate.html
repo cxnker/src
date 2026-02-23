@@ -520,7 +520,7 @@
 
         .mainbar {
             flex: 1;
-            max-width: 780px;
+            max-width: 950px;
         }
 
         .sidebar {
@@ -1261,20 +1261,6 @@
                                     <div class="popular-meta">1.5k downloads • 19 comments</div>
                                 </div>
                             </div>
-                            <div class="popular-item">
-                                <span class="popular-number">04</span>
-                                <div class="popular-content">
-                                    <h4 class="popular-title"><a href="#">Nexus LiteOS 10 1709</a></h4>
-                                    <div class="popular-meta">1.2k downloads • 9 comments</div>
-                                </div>
-                            </div>
-                            <div class="popular-item">
-                                <span class="popular-number">05</span>
-                                <div class="popular-content">
-                                    <h4 class="popular-title"><a href="#">Nexus LiteOS 11 Barebone</a></h4>
-                                    <div class="popular-meta">987 downloads • 7 comments</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -1283,8 +1269,6 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                             <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Windows 11</a>
                             <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Windows 10</a>
-                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Windows XP</a>
-                            <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">LiteOS</a>
                             <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">LTSC</a>
                             <a href="#" style="background: var(--transparent-bg); padding: 6px 12px; border-radius: 20px; color: var(--body-color);">Gaming</a>
                         </div>
@@ -1296,27 +1280,19 @@
         <!-- ===== MOBILE MENU ===== -->
         <div class="mobile-menu">
             <ul>
-                <li id="mobileMenuBtn">
-                    <svg viewBox="0 0 24 24">
-                        <line x1="3" x2="21" y1="12" y2="12"/>
-                        <line x1="3" x2="21" y1="6" y2="6"/>
-                        <line x1="3" x2="21" y1="18" y2="18"/>
-                    </svg>
-                </li>
-                <li onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 19V5M5 12l7-7 7 7"/>
-                    </svg>
-                </li>
                 <li id="mobileDarkToggle">
                     <svg viewBox="0 0 24 24">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                     </svg>
                 </li>
-                <li onclick="document.querySelector('.search-form input').focus()">
+                <li id="mobileMenuBtn">
                     <svg viewBox="0 0 24 24">
                         <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </li>
+                <li onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 19V5M5 12l7-7 7 7"/>
                     </svg>
                 </li>
             </ul>
@@ -1325,13 +1301,7 @@
         <!-- ===== FOOTER ===== -->
         <footer>
             <div class="footer-content">
-                <p>© 2025 · TheWorldofPC. All rights reserved. Windows is a trademark of Microsoft Corporation.</p>
-                <div class="back-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                    <span>Back to top</span>
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 19V5M5 12l7-7 7 7"/>
-                    </svg>
-                </div>
+                <p>© 2025 · TheWorldofPC. All rights reserved.</p>
             </div>
         </footer>
     </div>
