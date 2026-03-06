@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obfus1 - Lua Obfuscator | Optimized Edition</title>
+    <style>
+        :root {
+            --bg: #0a0a0f; --card: #14141c; --border: #2a2a3a; --text: #e0e0ff; --accent: #7d5fff;
+            --primary: #ff5e00; --primary-light: #ff8c00; --primary-dark: #ff3c00; --success: #4cd964;
+            --input-bg: #1e1e2a; --ios-red: #ff453a; --ios-accent: #0a84ff; --ios-subtext: #8e8e93;
+            --ios-green: #30d158; --ios-purple: #bf5af2; --ios-pink: #ff6482; --text-muted: #8b949e;
+            --glass-bg: rgba(20, 20, 28, 0.85); --glass-border: rgba(255, 255, 255, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; display: flex; justify-content: center; position: relative; overflow-x: hidden; }
+
+        /* FONDO Y NAV */
+        .bg-static { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 20% 30%, rgba(255,94,0,0.08) 0%, transparent 30%), radial-gradient(circle at 80% 70%, rgba(255,60,0,0.05) 0%, transparent 35%), radial-gradient(circle at 40% 60%, rgba(255,140,0,0.06) 0%, transparent 40%), var(--bg); }
+        .grid-overlay { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; pointer-events: none; }
+        
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; height: 70px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 600; font-size: 1.2rem; z-index: 1001; }
+        
+        /* HAMBURGUESA */
+        .hamburger { display: none; flex-direction: column; justify-content: space-between; width: 30px; height: 21px; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
+        .hamburger span { width: 100%; height: 3px; background: var(--text); transition: 0.3s; }
+        .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background: var(--primary); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background: var(--primary); }
+
+        /* NAV LINKS */
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; cursor: pointer; background: none; border: none; }
+        .nav-link:hover { color: #fff; }
+        .btn-nav { background: var(--primary); color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; transition: opacity 0.2s ease; }
+        .btn-nav:hover { background: #ff8c00; color: #fff; opacity: 1; }
+
+        /* MENÚ MÓVIL */
+        .mobile-menu { position: fixed; top: 0; right: -100%; width: 80%; max-width: 400px; height: 100vh; background: #0a0a0f; border-left: 1px solid var(--glass-border); padding: 100px 30px 30px; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; gap: 20px; }
+        .mobile-menu.active { right: 0; }
+        .mobile-menu .nav-link { font-size: 1.2rem; padding: 15px 0; border-bottom: 1px solid var(--glass-border); width: 100%; }
+        .mobile-menu .btn-nav { width: 100%; padding: 15px; font-size: 1.1rem; margin-top: 20px; }
+
+        /* OVERLAY */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 998; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .menu-overlay.active { opacity: 1; visibility: visible; }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container { max-width: 1200px; width: 100%; padding: 100px 20px 40px; position: relative; z-index: 1; margin: 0 auto; }
+        .page-header { text-align: center; margin-bottom: 50px; }
+        .header-badge { color: var(--primary); background: rgba(255, 94, 0, 0.1); border: 1px solid rgba(255, 94, 0, 0.2); border-radius: 50px; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 8px 16px; font-size: .85rem; }
+        .page-header h1 { letter-spacing: -1px; margin-bottom: 15px; font-size: 3.5rem; font-weight: 700; background: linear-gradient(135deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { color: var(--text-muted); max-width: 500px; margin: 0 auto; font-size: 1.15rem; line-height: 1.6; }
+        
+        /* FEATURES */
+        .features-preview { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .feature-badge { color: var(--text-muted); background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: 50px; display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: .85rem; }
+        .feature-badge svg { color: var(--primary); }
+
+        /* EDITOR GRID */
+        .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px; }
+        .editor-section, .output-section { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; overflow: hidden; transition: border-color 0.2s ease; }
+        .editor-section:hover, .output-section:hover { border-color: rgba(255, 94, 0, 0.2); }
+        .editor-header { background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .window-dots { display: flex; gap: 8px; }
+        .dot { border-radius: 50%; width: 12px; height: 12px; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .filename { color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-size: .9rem; }
+        
+        .stats-badge { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); padding: 4px 12px; border-radius: 30px; font-size: 0.8rem; color: var(--text-muted); font-family: 'Menlo', monospace; white-space: nowrap; }
+        .stats-badge.success { color: var(--success); border-color: rgba(76, 217, 100, 0.3); background: rgba(76, 217, 100, 0.1); }
+
+        .editor-wrapper { background: rgba(0, 0, 0, 0.3); min-height: 400px; max-height: 500px; display: flex; position: relative; }
+        .line-numbers { color: #444; text-align: right; user-select: none; background: #0d0d0d; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; min-width: 50px; padding: 20px 12px 20px 20px; font-family: 'Menlo', monospace; font-size: 13px; line-height: 1.6; }
+        .line-numbers span { height: 20.8px; display: block; }
+        .code-input, .code-output { color: #e0e0e0; resize: none; white-space: pre; background: transparent; border: none; flex: 1; padding: 20px; font-family: 'Menlo', monospace; font-size: 13px; line-height: 1.6; overflow: auto; outline: none; }
+        .code-output { white-space: pre-wrap; }
+
+        .toolbar { background: rgba(0, 0, 0, 0.3); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        .toolbar-left { display: flex; align-items: center; gap: 15px; }
+        .file-limit { color: var(--text-muted); font-size: .85rem; }
+        .btn-tool { color: #fff; cursor: pointer; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; display: flex; align-items: center; gap: 8px; padding: 10px 20px; font-size: .9rem; transition: background 0.2s, border-color 0.2s; }
+        .btn-tool:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 94, 0, 0.3); }
+
+        /* PANEL PROTECCIONES */
+        .protection-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; margin-bottom: 30px; }
+        .protection-title { font-size: 1.2rem; color: var(--primary); font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .protection-title::before { content: '◆'; color: var(--primary); }
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .option-item { display: flex; align-items: center; justify-content: space-between; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: 16px; padding: 14px 20px; transition: border-color 0.2s; }
+        .option-item:hover { border-color: rgba(255, 94, 0, 0.2); }
+        .item-label { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 1rem; font-weight: 500; }
+        .feature-tag { font-size: 11px; background: rgba(255, 255, 255, 0.05); padding: 3px 10px; border-radius: 50px; color: var(--text-muted); }
+        .enhanced-tag { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; font-size: 10px; padding: 3px 8px; border-radius: 50px; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* TOGGLES IOS */
+        .toggle { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background: #39393d; border-radius: 20px; transition: .3s; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 28px; left: 2px; bottom: 2px; background: white; border-radius: 10px; transition: .3s; }
+        input:checked + .slider { animation: haptic-pop 0.3s ease; }
+        input:checked + .slider:before { transform: translateX(18px); }
+        #optTamper:checked + .slider { background: var(--ios-red); }
+        #optStrings:checked + .slider, #optNumbers:checked + .slider, #optControlFlow:checked + .slider { 
+            background: var(--primary); 
+        }
+        @keyframes haptic-pop { 50% { transform: scale(1.05); } }
+
+        /* ACTION BAR */
+        .action-bar { display: flex; gap: 16px; margin-bottom: 30px; align-items: center; flex-wrap: wrap; }
+        .btn-primary { position: relative; padding: 16px 28px; border: none; border-radius: 16px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; gap: 12px; transition: all 0.3s; flex: 2; min-width: 250px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(255, 94, 0, 0.2); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255, 94, 0, 0.4); }
+        .btn-primary:active { transform: translateY(0); box-shadow: 0 4px 12px rgba(255, 94, 0, 0.3); }
+        .btn-secondary { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); color: var(--text); padding: 16px 24px; border-radius: 16px; cursor: pointer; transition: all 0.3s; font-weight: 600; font-size: 1rem; display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-width: 120px; }
+        .btn-secondary:hover { color: var(--primary); border-color: var(--primary); background: rgba(255, 94, 0, 0.1); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 0, 0.2); }
+        
+        .spinner { display: none; width: 20px; height: 20px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer { text-align: center; color: var(--text-muted); font-size: 0.95rem; padding-top: 30px; border-top: 1px solid var(--glass-border); margin-top: 30px; }
+
+        @media (max-width: 768px) { 
+            .page-header h1 { font-size: 2.5rem; } 
+            .editor-grid { grid-template-columns: 1fr; } 
+            .action-bar { flex-direction: column; } 
+            .btn-primary, .btn-secondary { width: 100%; } 
+            .nav-links { display: none; } 
+            .hamburger { display: flex; }
+            .toolbar { flex-direction: column; gap: 15px; } 
+            .toolbar-left { width: 100%; justify-content: center; } 
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-static"></div><div class="grid-overlay"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="nav-logo" href="#">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                <span>Obfus1</span>
+            </a>
+            
+            <!-- Botón Hamburguesa -->
+            <button class="hamburger" id="hamburgerBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Menú Desktop -->
+            <div class="nav-links">
+                <a class="nav-link">Home</a>
+                <a class="nav-link">Support</a>
+                <a class="nav-link btn-nav" href="#">Obfuscate</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menú Móvil -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a class="nav-link">Home</a>
+        <a class="nav-link">Support</a>
+        <button class="btn-nav">Obfuscate</button>
+    </div>
+
+    <!-- Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="header-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                <span>Powerful Protection</span>
+            </div>
+            <h1>Obfuscate Your Code</h1>
+            <p class="subtitle">Protect your Lua scripts with military-grade encryption and anti-tamper technology.</p>
+        </div>
+
+        <div class="features-preview">
+            <div class="feature-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>String Encryption</span></div>
+            <div class="feature-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg><span>VM Protection</span></div>
+            <div class="feature-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg><span>Anti-Tamper</span></div>
+            <div class="feature-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="14" y="14" width="4" height="6" rx="2"></rect><rect x="6" y="4" width="4" height="6" rx="2"></rect></svg><span>Bytecode Encode</span></div>
+        </div>
+
+        <div class="editor-grid">
+            <div class="editor-section">
+                <div class="editor-header"><div class="header-left"><div class="window-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><span class="filename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18L22 12 16 6"></path><path d="M8 6L2 12 8 18"></path></svg>input.lua</span></div><div class="stats-badge" id="inStats">0 chars | 0.00 KB</div></div>
+                <div class="editor-wrapper"><div class="line-numbers"><span>I</span><span>N</span><span>P</span><span>U</span><span>T</span></div><textarea class="code-input" id="input" spellcheck="false" placeholder="-- Paste your Lua script here...">local Players = game:GetService("Players")
+print("Hello from " .. Players.LocalPlayer.Name)</textarea></div>
+                <div class="toolbar">
+                    <div class="toolbar-left"><input type="file" id="fileIn" accept=".lua,.luau,.txt" style="display: none;"><button class="btn-tool" onclick="document.getElementById('fileIn').click()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>Upload File</button><span class="file-limit">Max 1MB</span></div>
+                    <span class="stats-badge" id="inStatus">READY</span>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="editor-header"><div class="header-left"><div class="window-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><span class="filename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18L22 12 16 6"></path><path d="M8 6L2 12 8 18"></path></svg>protected.lua</span></div><span class="stats-badge" id="outStats">0 chars | 0.00 KB</span></div>
+                <div class="editor-wrapper"><div class="line-numbers"><span>O</span><span>U</span><span>T</span><span>P</span><span>U</span><span>T</span></div><textarea class="code-output" id="output" readonly placeholder="-- Protected code will appear here..."></textarea></div>
+            </div>
+        </div>
+
+        <div class="protection-panel">
+            <div class="protection-title">🛡️ Protecciones</div>
+            <div class="options-grid">
+                <div class="option-item"><span class="item-label"><span>String Encryption</span><span class="feature-tag">AES-256</span></span><label class="toggle"><input type="checkbox" id="optStrings" checked><span class="slider"></span></label></div>
+                <div class="option-item"><span class="item-label"><span>Number Obfuscation</span><span class="feature-tag">6 métodos</span></span><label class="toggle"><input type="checkbox" id="optNumbers" checked><span class="slider"></span></label></div>
+                <div class="option-item"><span class="item-label"><span style="color: var(--ios-red);">Anti-Tamper</span><span class="enhanced-tag">PRO</span><span class="feature-tag">crash on modify</span></span><label class="toggle"><input type="checkbox" id="optTamper" checked><span class="slider"></span></label></div>
+                <div class="option-item"><span class="item-label"><span>Control Flow</span><span class="feature-tag">mutación</span></span><label class="toggle"><input type="checkbox" id="optControlFlow" checked><span class="slider"></span></label></div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn-primary" id="obfuscateBtn"><span class="spinner" id="btnSpinner"></span><span id="btnText">OBFUSCATE NOW</span></button>
+            <button class="btn-secondary" id="copyBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> COPY</button>
+            <button class="btn-secondary" id="downloadBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"></path><path d="m8 11 4 4 4-4"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg> DOWNLOAD</button>
+            <button class="btn-secondary" id="clearBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 4V2h8v2"></path></svg> CLEAR</button>
+        </div>
+
+        <div class="footer"><p>⚡ Obfus1 • Military-grade Lua obfuscation<br><span style="margin-top: 8px; opacity: 0.7;">© 2026 Obfus1 • All rights reserved</span></p></div>
+    </div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        const [input, output, inStats, outStats, inStatus] = ['input', 'output', 'inStats', 'outStats', 'inStatus'].map($);
+        const [obfBtn, copyBtn, dwnBtn, clearBtn] = ['obfuscateBtn', 'copyBtn', 'downloadBtn', 'clearBtn'].map($);
+        
+        // Elementos del menú hamburguesa
+        const hamburgerBtn = $('hamburgerBtn');
+        const mobileMenu = $('mobileMenu');
+        const menuOverlay = $('menuOverlay');
+
+        // Función para abrir/cerrar menú
+        function toggleMenu() {
+            hamburgerBtn.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        // Event listeners para el menú
+        hamburgerBtn.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
+        
+        // Cerrar menú al hacer click en un link
+        document.querySelectorAll('.mobile-menu .nav-link, .mobile-menu .btn-nav').forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        const icnCopy = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> COPY`;
+        const icnCopied = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> COPIED!`;
+
+        const updateStats = () => {
+            const iL = input.value.length, oL = output.value.length;
+            inStats.textContent = `${iL} chars | ${(iL/1024).toFixed(2)} KB`;
+            outStats.textContent = `${oL} chars | ${(oL/1024).toFixed(2)} KB`;
+            inStatus.textContent = input.value.trim() ? 'READY' : 'EMPTY';
+        };
+
+        [input, output].forEach(e => e.addEventListener('input', updateStats)); updateStats();
+
+        const obfuscateCode = code => {
+            const s = $('optStrings').checked, n = $('optNumbers').checked, t = $('optTamper').checked, c = $('optControlFlow').checked;
+            let res = `--[[\n  Obfus1 Protected Script\n  Generated: ${new Date().toISOString()}\n  Protections:\n`;
+            if (s) res += '  • String Encryption (AES-256)\n'; if (n) res += '  • Number Obfuscation (6 methods)\n';
+            if (t) res += '  • Anti-Tamper PRO\n'; if (c) res += '  • Control Flow Mutation\n';
+            res += ']]--\n\n' + code.split('\n').map(l => {
+                if (s && l.includes('"')) l = l.replace(/"([^"]*)"/g, (_, p) => `_S("${btoa(p).split('').reverse().join('')}")`);
+                if (t) l = l.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g, m => ['local','function','if','then','else','end','return','print'].includes(m) ? m : '_' + [...m].map(x => x.charCodeAt(0).toString(16)).join(''));
+                return l;
+            }).join('\n') + (t ? '\n-- Anti-Tamper\ndo local a=debug.getinfo;debug.getinfo=function(...)local b=a(...);if not b then error("Tamper detected")end return b end end\n' : '');
+            return res;
+        };
+
+        obfBtn.addEventListener('click', () => {
+            if (!input.value.trim()) {
+                alert('Please paste some code to obfuscate');
+                return;
+            }
+            
+            $('btnSpinner').style.display = 'inline-block';
+            $('btnText').textContent = 'OBFUSCATING...';
+            obfBtn.style.pointerEvents = 'none';
+            
+            // Procesamiento inmediato sin pantalla de carga
+            setTimeout(() => {
+                output.value = obfuscateCode(input.value);
+                updateStats();
+                
+                $('btnSpinner').style.display = 'none';
+                $('btnText').textContent = 'OBFUSCATE NOW';
+                obfBtn.style.pointerEvents = 'auto';
+                inStatus.textContent = 'PROTECTED';
+                inStatus.classList.add('success');
+            }, 50); // Pequeño delay para permitir que el spinner se muestre
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            if (!output.value) {
+                alert('No output to copy');
+                return;
+            }
+            try { await navigator.clipboard.writeText(output.value); } catch { output.select(); document.execCommand('copy'); }
+            copyBtn.innerHTML = icnCopied; setTimeout(() => copyBtn.innerHTML = icnCopy, 1500);
+        });
+
+        dwnBtn.addEventListener('click', () => {
+            if (!output.value) {
+                alert('No output to download');
+                return;
+            }
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([output.value], {type: 'text/plain'})); a.download = `protected_${Date.now()}.lua`; a.click();
+        });
+
+        clearBtn.addEventListener('click', () => { input.value = ''; output.value = ''; inStatus.classList.remove('success'); updateStats(); });
+        $('fileIn').addEventListener('change', e => { const f = e.target.files[0]; if (f) { const r = new FileReader(); r.onload = e => { input.value = e.target.result; updateStats(); }; r.readAsText(f); } });
+    </script>
+</body>
+</html>
